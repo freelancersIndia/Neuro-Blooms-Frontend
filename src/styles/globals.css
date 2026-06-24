@@ -16,6 +16,18 @@
   --color-accent-dark: #D97706;
   --color-accent-soft: #FEF3C7;
 
+  --color-admin-blue-50: #eff6ff;
+  --color-admin-blue-100: #dbeafe;
+  --color-admin-blue-500: #3b82f6;
+  --color-admin-blue-600: #2563eb;
+  --color-admin-blue-700: #1d4ed8;
+  --color-admin-blue-800: #1e40af;
+  
+  --color-admin-green-50: #ecfdf5;
+  --color-admin-green-100: #d1fae5;
+  --color-admin-green-500: #10b981;
+  --color-admin-green-600: #059669;
+
   --font-display: "Outfit", "Inter", sans-serif;
   --font-body: "Inter", sans-serif;
 

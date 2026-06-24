@@ -17,10 +17,17 @@ const BlogDetailsPage = lazy(() => import('../pages/Blog/BlogDetailsPage'));
 const FAQPage = lazy(() => import('../pages/FAQ/FAQPage'));
 const NotFoundPage = lazy(() => import('../pages/NotFound/NotFoundPage'));
 
+// Admin routes
+const AdminRoutes = lazy(() => import('../admin/routes/AdminRoutes'));
+
 export const AppRoutes = () => {
   return (
     <Suspense fallback={<LoadingSpinner size="lg" className="min-h-screen" />}>
       <Routes>
+        {/* Dedicated Admin Portal Routes */}
+        <Route path="/admin/*" element={<AdminRoutes />} />
+
+        {/* Public Website Routes */}
         <Route element={<MainLayout />}>
           <Route path={ROUTES.HOME} element={<HomePage />} />
           <Route path={ROUTES.ABOUT} element={<AboutPage />} />
