@@ -53,7 +53,7 @@ export const DashboardLayout = () => {
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard, isReal: true },
     { name: 'Appointments', path: '#', icon: Calendar, isReal: false },
     { name: 'Doctors', path: '#', icon: HeartPulse, isReal: false },
-    { name: 'Users', path: '#', icon: UserCheck, isReal: false },
+    { name: 'Users', path: '/admin/users', icon: UserCheck, isReal: true },
     { name: 'Security', path: '#', icon: Shield, isReal: false },
     { name: 'Sessions', path: '#', icon: Monitor, isReal: false },
     { name: 'Content Management', path: '#', icon: Globe, isReal: false },

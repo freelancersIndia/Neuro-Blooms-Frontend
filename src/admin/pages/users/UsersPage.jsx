@@ -1,100 +1,253 @@
-import React from 'react';
-import { UserPlus, Search, Edit2, Trash2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { Plus, Users, UserCheck, Shield, UserX } from 'lucide-react';
+import userService from '../../services/user.service';
+import { StatisticsCard } from './components/StatisticsCard';
+import { UsersToolbar } from './components/UsersToolbar';
+import { UserCard } from './components/UserCard';
+import { UsersPagination } from './components/UsersPagination';
+import { UserFormModal } from '../../components/users/UserFormModal';
 
 export const UsersPage = () => {
-  const users = [
-    { id: 1, name: 'Admin Administrator', email: 'admin@neuroblooms.com', role: 'ADMIN', status: 'Active', joined: 'May 10, 2026' },
-    { id: 2, name: 'Dr. Priya Nair', email: 'priya.nair@neuroblooms.com', doctorId: 'DOC-1201', role: 'DOCTOR', status: 'Active', joined: 'May 12, 2026' },
-    { id: 3, name: 'Dr. Rajesh Verma', email: 'rajesh.verma@neuroblooms.com', doctorId: 'DOC-1202', role: 'DOCTOR', status: 'Active', joined: 'May 15, 2026' },
-    { id: 4, name: 'Sonia Gill', email: 'sonia.gill@neuroblooms.com', role: 'RECEPTIONIST', status: 'Active', joined: 'June 01, 2026' },
-    { id: 5, name: 'Rahul Kapoor', email: 'rahul.kapoor@neuroblooms.com', role: 'RECEPTIONIST', status: 'Suspended', joined: 'June 04, 2026' }
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [roleFilter, setRoleFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // API State
+  const [usersList, setUsersList] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+  const [statsData, setStatsData] = useState({
+    total_users: 127,
+    verified_users: 86,
+    active_users: 98,
+    inactive_users: 29
+  });
+
+  // Fetch Listing
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await userService.getUsers({
+        page: currentPage,
+        page_size: pageSize,
+        search: searchQuery,
+        role: roleFilter,
+        is_active: statusFilter
+      });
+      if (response && response.success && response.data) {
+        setUsersList(response.data.results || []);
+        setTotalUsers(response.data.count || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch Stats
+  const fetchStats = async () => {
+    try {
+      const response = await userService.getUserStatistics();
+      if (response && response.success && response.data) {
+        setStatsData(response.data);
+      }
+    } catch (err) {
+      console.error('Error fetching user stats:', err);
+    }
+  };
+
+  // Initial stats fetch
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  // Fetch listing when page, page size, search, role or status filter changes
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      fetchUsers();
+    }, searchQuery ? 300 : 0);
+
+    return () => clearTimeout(delayDebounce);
+  }, [currentPage, pageSize, searchQuery, roleFilter, statusFilter]);
+
+  // Reset page to 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, roleFilter, statusFilter]);
+
+  // Statistics Data
+  const stats = [
+    {
+      title: 'Total Users',
+      value: statsData.total_users.toString(),
+      trend: '↑ 12 this month',
+      icon: Users,
+      iconBgColor: 'bg-admin-blue-50 border-admin-blue-100',
+      iconColor: 'text-admin-blue-600',
+      trendColor: 'text-emerald-600'
+    },
+    {
+      title: 'Active Users',
+      value: statsData.active_users.toString(),
+      trend: '↑ 15 this month',
+      icon: UserCheck,
+      iconBgColor: 'bg-emerald-50 border-emerald-100',
+      iconColor: 'text-emerald-600',
+      trendColor: 'text-emerald-600'
+    },
+    {
+      title: 'Verified Users',
+      value: statsData.verified_users.toString(),
+      trend: '↑ 10 this month',
+      icon: Shield,
+      iconBgColor: 'bg-purple-50 border-purple-100',
+      iconColor: 'text-purple-600',
+      trendColor: 'text-emerald-600'
+    },
+    {
+      title: 'Inactive Users',
+      value: statsData.inactive_users.toString(),
+      trend: '↓ 3 this month',
+      icon: UserX,
+      iconBgColor: 'bg-red-50 border-red-100',
+      iconColor: 'text-red-600',
+      trendColor: 'text-red-650'
+    }
   ];
 
+  // Action Loggers
+  const handleRefresh = () => {
+    console.log('Refresh Clicked');
+    fetchStats();
+    fetchUsers();
+  };
+
+  const handleReset = () => {
+    console.log('Reset Filters Clicked');
+    setSearchQuery('');
+    setRoleFilter('ALL');
+    setStatusFilter('ALL');
+    setCurrentPage(1);
+  };
+
   return (
-    <div className="flex flex-col gap-6 text-left select-none">
-      
-      {/* Table Header Controls */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        
-        {/* Left: Search Box */}
-        <div className="relative flex-1 max-w-md">
-          <div className="absolute left-4 text-slate-400 top-1/2 -translate-y-1/2">
-            <Search className="w-4 h-4" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search users by name, email, or role..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-2.5 text-xs font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-admin-blue-500 focus:ring-4 focus:ring-admin-blue-100 transition-all duration-150"
-          />
+    <div className="flex flex-col gap-6 text-left select-none pb-6">
+      {/* 1. Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex flex-col text-left">
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight font-display">
+            Users
+          </h1>
+          <p className="text-xs font-semibold text-slate-400 mt-1">
+            Manage administrators, doctors and receptionists.
+          </p>
         </div>
 
-        {/* Right: Actions */}
-        <button className="bg-admin-blue-600 hover:bg-admin-blue-700 text-white font-bold text-xs px-5 py-3 rounded-xl inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-150 cursor-pointer self-start sm:self-auto">
-          <UserPlus className="w-4 h-4" />
-          <span>Add New Staff</span>
-        </button>
-      </div>
-
-      {/* Users Table Card */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-100">
-            <thead>
-              <tr className="text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                <th className="pb-4">Name</th>
-                <th className="pb-4">Email</th>
-                <th className="pb-4">Role</th>
-                <th className="pb-4">Date Joined</th>
-                <th className="pb-4">Status</th>
-                <th className="pb-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs font-bold text-slate-700">
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="py-4 font-extrabold text-slate-800">{user.name}</td>
-                  <td className="py-4 text-slate-500 font-semibold">{user.email}</td>
-                  <td className="py-4">
-                    <span
-                      className={`inline-flex px-2 py-0.5 rounded-md text-[9px] font-extrabold tracking-wide uppercase ${
-                        user.role === 'ADMIN'
-                          ? 'bg-admin-blue-50 text-admin-blue-700'
-                          : user.role === 'DOCTOR'
-                          ? 'bg-rose-50 text-rose-700'
-                          : 'bg-indigo-50 text-indigo-700'
-                      }`}
-                    >
-                      {user.role}
-                    </span>
-                  </td>
-                  <td className="py-4 text-slate-500 font-semibold">{user.joined}</td>
-                  <td className="py-4">
-                    <span
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        user.status === 'Active'
-                          ? 'bg-emerald-50 text-emerald-700'
-                          : 'bg-red-50 text-red-700'
-                      }`}
-                    >
-                      <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'Active' ? 'bg-emerald-500' : 'bg-red-500'}`} />
-                      {user.status}
-                    </span>
-                  </td>
-                  <td className="py-4 text-right flex items-center justify-end gap-1.5">
-                    <button className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer">
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button className="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors cursor-pointer">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Header Action Buttons */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => {
+              console.log('Create User Clicked');
+              setIsCreateModalOpen(true);
+            }}
+            className="flex items-center justify-center gap-2 px-5 py-3 bg-admin-blue-600 hover:bg-admin-blue-700 text-xs font-bold text-white rounded-[14px] shadow-md hover:shadow-lg shadow-admin-blue-600/10 hover:shadow-admin-blue-600/20 transition-all duration-150 cursor-pointer flex-1 sm:flex-initial"
+          >
+            <Plus className="w-4.5 h-4.5" />
+            <span>Create User</span>
+          </motion.button>
         </div>
       </div>
 
+      {/* 2. Statistics Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, idx) => (
+          <StatisticsCard key={idx} {...stat} />
+        ))}
+      </div>
+
+      {/* 3. Toolbar */}
+      <UsersToolbar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        roleFilter={roleFilter}
+        setRoleFilter={setRoleFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        onRefresh={handleRefresh}
+        onReset={handleReset}
+      />
+
+      {/* 4. User Cards Grid / Skeleton Loading */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="bg-white border border-slate-100 rounded-[24px] p-5 shadow-sm animate-pulse flex flex-col gap-4 h-[255px]"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-[16px] bg-slate-100 flex-shrink-0" />
+                <div className="flex-1 flex flex-col gap-2">
+                  <div className="h-4 bg-slate-100 rounded w-2/3" />
+                  <div className="h-3 bg-slate-100 rounded w-1/3" />
+                </div>
+              </div>
+              <div className="h-5 bg-slate-100 rounded w-1/4" />
+              <div className="h-px bg-slate-100 my-1" />
+              <div className="flex flex-col gap-2.5">
+                <div className="h-3 bg-slate-100 rounded w-5/6" />
+                <div className="h-3 bg-slate-100 rounded w-1/2" />
+              </div>
+              <div className="flex items-center justify-between mt-auto pt-2 border-t border-slate-50">
+                <div className="h-5 bg-slate-100 rounded w-1/3" />
+                <div className="h-5 bg-slate-100 rounded w-1/4" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : usersList.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          {usersList.map((user) => (
+            <UserCard key={user.id} user={user} />
+          ))}
+        </div>
+      ) : (
+        <div className="bg-white border border-slate-100 rounded-[24px] p-12 text-center shadow-sm">
+          <div className="text-slate-350 text-sm font-bold">No users match the search filters.</div>
+          <button
+            onClick={handleReset}
+            className="mt-4 text-xs font-black text-admin-blue-600 hover:underline cursor-pointer"
+          >
+            Clear Filters
+          </button>
+        </div>
+      )}
+
+      {/* 5. Pagination */}
+      <UsersPagination
+        totalUsers={totalUsers}
+        currentPage={currentPage}
+        pageSize={pageSize}
+        onPageChange={setCurrentPage}
+        onPageSizeChange={setPageSize}
+      />
+
+      <UserFormModal
+        mode="create"
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => {
+          fetchStats();
+          fetchUsers();
+        }}
+      />
     </div>
   );
 };
