@@ -7,6 +7,8 @@ import Step1SlotSelection from './Step1SlotSelection';
 import Step2Questionnaire from './Step2Questionnaire';
 import Step3AppointmentSummary from './Step3AppointmentSummary';
 import AppointmentSuccess from './AppointmentSuccess';
+import { submitConsultationRequest } from '../../services/appointment.service';
+import toast from 'react-hot-toast';
 
 export const AppointmentModal = () => {
   const { isOpen, closeModal } = useAppointmentModal();
@@ -18,13 +20,26 @@ export const AppointmentModal = () => {
 
   // Form values state to sync with Step 3 Summary
   const [formValues, setFormValues] = useState({
+    parentFirstName: '',
+    parentLastName: '',
+    parentRelationship: '',
     parentName: '',
     phone: '',
+    alternativePhone: '',
     email: '',
+    childFirstName: '',
+    childLastName: '',
     childName: '',
     childGender: '',
     childAge: '',
     childDob: '',
+    appointmentType: '',
+    primaryConcern: '',
+    otherConcernDetails: '',
+    referralSource: '',
+    consentAccurate: false,
+    consentPrivacy: false,
+    consentTerms: false,
     consultationReason: '',
     concerns: [],
     noticePeriod: '',
@@ -58,13 +73,26 @@ export const AppointmentModal = () => {
     setShowSuccess(false);
     setIsSubmitting(false);
     setFormValues({
+      parentFirstName: '',
+      parentLastName: '',
+      parentRelationship: '',
       parentName: '',
       phone: '',
+      alternativePhone: '',
       email: '',
+      childFirstName: '',
+      childLastName: '',
       childName: '',
       childGender: '',
       childAge: '',
       childDob: '',
+      appointmentType: '',
+      primaryConcern: '',
+      otherConcernDetails: '',
+      referralSource: '',
+      consentAccurate: false,
+      consentPrivacy: false,
+      consentTerms: false,
       consultationReason: '',
       concerns: [],
       noticePeriod: '',
@@ -98,32 +126,70 @@ export const AppointmentModal = () => {
   const handleFinalConfirm = () => {
     setIsSubmitting(true);
     
+    // Map appointment type to Constant
+    let appointment_type = 'INITIAL_CONSULTATION';
+    if (formValues.appointmentType === 'Development Assessment') {
+      appointment_type = 'DEVELOPMENT_ASSESSMENT';
+    }
+
+    // Handle "Other" concern details in additional notes
+    let additional_notes = formValues.notes || '';
+    if (formValues.primaryConcern === 'Other') {
+      additional_notes = `[Specific Concern: ${formValues.otherConcernDetails}] ${additional_notes}`.trim();
+    }
+
     const payload = {
-      doctor_id: 1,
-      appointment_date: selectedDate.toISOString().split('T')[0],
-      appointment_time: selectedSlot,
-      parent_name: formValues.parentName,
-      phone: formValues.phone,
-      email: formValues.email,
-      child_name: formValues.childName,
-      child_gender: formValues.childGender,
-      child_age: formValues.childAge,
-      child_dob: formValues.childDob,
-      consultation_reason: formValues.consultationReason,
-      concerns: formValues.concerns,
-      first_notice_period: formValues.noticePeriod,
-      previous_therapy: formValues.previousTherapy === 'Yes',
-      schooling_status: formValues.schoolingStatus,
-      notes: formValues.notes
+      parent_first_name: formValues.parentFirstName,
+      parent_last_name: formValues.parentLastName,
+      relationship_to_child: formValues.parentRelationship,
+      mobile_number: formValues.phone,
+      alternate_mobile_number: formValues.alternativePhone || '',
+      email: formValues.email || '',
+      child_first_name: formValues.childFirstName,
+      child_last_name: formValues.childLastName,
+      date_of_birth: formValues.childDob,
+      gender: formValues.childGender,
+      appointment_type: appointment_type,
+      primary_concern: formValues.primaryConcern,
+      preferred_date: selectedDate.toISOString().split('T')[0],
+      preferred_time_slot: selectedSlot,
+      additional_notes: additional_notes,
+      referral_source: formValues.referralSource || ''
     };
 
-    console.log("Submit Appointment Wizard Payload:", payload);
+    console.log("Submit Appointment Request Payload:", payload);
 
-    // Simulate API delay
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setShowSuccess(true);
-    }, 1500);
+    submitConsultationRequest(payload)
+      .then((data) => {
+        setIsSubmitting(false);
+        // Show success toast with request number
+        toast.success(`Request submitted successfully! Tracking Number: ${data.data?.request_number || ''}`, {
+          duration: 6000
+        });
+        setShowSuccess(true);
+      })
+      .catch((error) => {
+        setIsSubmitting(false);
+        
+        // Handle validation errors (HTTP 400) or Conflict (HTTP 409) or other errors
+        if (error.status === 409) {
+          toast.error("A consultation request already exists for this child on the selected date.", {
+            duration: 6000
+          });
+        } else if (error.errors) {
+          // Display validation errors dictionary nicely
+          const errorDetails = Object.entries(error.errors)
+            .map(([field, messages]) => `${field.replace(/_/g, ' ')}: ${messages.join(', ')}`)
+            .join(' | ');
+          toast.error(`Validation Failed: ${errorDetails}`, {
+            duration: 7000
+          });
+        } else {
+          toast.error(error.message || 'Failed to submit consultation request. Please try again.', {
+            duration: 5000
+          });
+        }
+      });
   };
 
   const handleBackdropClick = (e) => {
@@ -166,14 +232,19 @@ export const AppointmentModal = () => {
               {/* Modal Header */}
               <div className="p-6 sm:p-7 border-b border-slate-100 flex flex-col items-center justify-center text-center space-y-4">
                 <div className="flex flex-col items-center justify-center space-y-1 mt-2">
+                  {step === 2 && (
+                    <span className="text-[11px] font-bold text-[#3B8A4C] uppercase tracking-wider mb-1 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100/50 font-display">
+                      Step 2 of 4
+                    </span>
+                  )}
                   <h2 className="text-xl sm:text-2xl font-extrabold text-slate-800 font-display">
                     {step === 1 && 'Book an Appointment'}
-                    {step === 2 && 'Child Development Questionnaire'}
+                    {step === 2 && 'Consultation Questionnaire'}
                     {step === 3 && 'Appointment Summary'}
                   </h2>
-                  <p className="text-xs sm:text-sm text-slate-400 font-semibold leading-none">
+                  <p className="text-xs sm:text-sm text-slate-400 font-semibold leading-relaxed max-w-xl">
                     {step === 1 && 'Choose a convenient date and available time slot.'}
-                    {step === 2 && 'Help us understand your child better.'}
+                    {step === 2 && "Please provide a few details so our doctor can better understand your child's needs before the appointment."}
                     {step === 3 && 'Please review your details before confirming.'}
                   </p>
                 </div>
@@ -276,7 +347,7 @@ export const AppointmentModal = () => {
                         type="button"
                         className="border border-[#3B8A4C] text-[#3B8A4C] hover:bg-emerald-50/15 font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full transition-colors cursor-pointer"
                       >
-                        &larr; Back
+                        ← Back
                       </motion.button>
 
                       <motion.button
@@ -284,10 +355,10 @@ export const AppointmentModal = () => {
                         whileTap={{ scale: 0.97 }}
                         form="questionnaire-form"
                         type="submit"
-                        className="bg-[#3B8A4C] hover:bg-[#327540] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                        className="bg-[#3B8A4C] hover:bg-[#327540] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-full inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer font-display"
                       >
-                        <span>Next</span>
-                        <span>&rarr;</span>
+                        <span>Continue</span>
+                        <span>→</span>
                       </motion.button>
                     </div>
                   </>

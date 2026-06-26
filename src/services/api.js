@@ -42,7 +42,15 @@ api.interceptors.response.use(
       // Redirect or emit event could go here
     }
 
-    return Promise.reject(new Error(errorMessage));
+    const customError = new Error(errorMessage);
+    if (error.response?.data?.errors) {
+      customError.errors = error.response.data.errors;
+    }
+    if (error.response?.status) {
+      customError.status = error.response.status;
+    }
+
+    return Promise.reject(customError);
   }
 );
 

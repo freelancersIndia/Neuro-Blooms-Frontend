@@ -19,3 +19,8 @@ export const createAppointment = async (appointmentData) => {
     };
   }
 };
+
+export const submitConsultationRequest = async (requestData) => {
+  const response = await api.post('/api/v1/public/consultation-request/', requestData);
+  return response.data;
+};

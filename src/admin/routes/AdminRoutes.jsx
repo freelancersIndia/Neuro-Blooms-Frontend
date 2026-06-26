@@ -22,6 +22,7 @@ const SuccessPage = lazy(() => import('../pages/auth/Success/SuccessPage'));
 const DashboardPage = lazy(() => import('../pages/dashboard/DashboardPage'));
 const UsersPage = lazy(() => import('../pages/users/UsersPage'));
 const UserDetailsPage = lazy(() => import('../pages/users/UserDetailsPage'));
+const AppointmentRequestsPage = lazy(() => import('../../pages/appointments/AppointmentRequestsPage'));
 
 // Admin root selector that redirects based on login state
 const AdminRootRedirect = () => {
@@ -62,6 +63,7 @@ export const AdminRoutes = () => {
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="users/:userId" element={<UserDetailsPage />} />
+          <Route path="appointments/requests" element={<AppointmentRequestsPage />} />
           {/* Redirect all other console sub-paths back to dashboard */}
           <Route path="*" element={<Navigate to="dashboard" replace />} />
         </Route>

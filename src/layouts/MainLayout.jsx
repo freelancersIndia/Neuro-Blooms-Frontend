@@ -6,6 +6,7 @@ import ScrollToTop from '../components/layout/ScrollToTop';
 import AppointmentModal from '../components/appointment/AppointmentModal';
 import { useAppointmentModal } from '../context/AppointmentModalContext';
 import { ROUTES } from '../utils/routes';
+import { Toaster } from 'react-hot-toast';
 
 export const MainLayout = () => {
   const location = useLocation();
@@ -41,6 +42,9 @@ export const MainLayout = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* Toast notifications container */}
+      <Toaster position="top-right" reverseOrder={false} />
 
       {/* Reusable global Booking Modal Popup */}
       <AppointmentModal />
