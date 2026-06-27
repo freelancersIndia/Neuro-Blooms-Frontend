@@ -7,7 +7,7 @@ import Step1SlotSelection from './Step1SlotSelection';
 import Step2Questionnaire from './Step2Questionnaire';
 import Step3AppointmentSummary from './Step3AppointmentSummary';
 import AppointmentSuccess from './AppointmentSuccess';
-import { submitConsultationRequest } from '../../services/appointment.service';
+import { submitConsultationRequest } from '../../features/public-site/services/appointment.service';
 import toast from 'react-hot-toast';
 
 export const AppointmentModal = () => {

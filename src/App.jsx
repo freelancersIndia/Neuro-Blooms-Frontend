@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import AppRoutes from './routes/AppRoutes';
+import AppRoutes from './router/AppRoutes';
 
 import { AppointmentModalProvider } from './context/AppointmentModalContext';
 
