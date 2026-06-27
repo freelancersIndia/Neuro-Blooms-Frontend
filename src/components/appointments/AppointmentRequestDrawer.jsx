@@ -1,10 +1,11 @@
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Baby, CalendarDays, ExternalLink, ShieldCheck, Mail, Phone, Clock } from 'lucide-react';
+import { X, User, Baby, CalendarDays, ExternalLink, ShieldCheck, Mail, Phone } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import AppointmentStatusBadge from './AppointmentStatusBadge';
 import { APPOINTMENT_TYPE_LABELS } from '../../constants/appointmentTypes';
 
 export const AppointmentRequestDrawer = ({ isOpen, request, onClose, onApprove, onReject }) => {
+  const navigate = useNavigate();
   if (!request) return null;
 
   const displayType = APPOINTMENT_TYPE_LABELS[request.appointmentType] || request.appointmentType;
@@ -53,7 +54,7 @@ export const AppointmentRequestDrawer = ({ isOpen, request, onClose, onApprove, 
                 </span>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-[10px] font-black text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md font-display">
-                    {request.id}
+                    {request.requestNumber || request.id}
                   </span>
                   <AppointmentStatusBadge status={request.status} />
                 </div>
@@ -154,42 +155,50 @@ export const AppointmentRequestDrawer = ({ isOpen, request, onClose, onApprove, 
 
             {/* 3. STICKY ACTIONS (Fixed at bottom) */}
             <div className="p-4.5 border-t border-slate-100 flex flex-col gap-2.5 bg-white flex-shrink-0 select-none">
-              <div className="flex gap-3">
-                {/* Approve Button */}
+              {request.status === 'PENDING' && (
+                <div className="flex gap-3">
+                  {/* Approve Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onApprove(request);
+                      onClose();
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white py-2.5 rounded-xl text-xs font-black shadow-md cursor-pointer transition-colors font-display"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Approve Request</span>
+                  </button>
+
+                  {/* Reject Button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onReject(request);
+                      onClose();
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-xl text-xs font-black shadow-md cursor-pointer transition-colors font-display"
+                  >
+                    <X className="w-4 h-4 stroke-[2.5px]" />
+                    <span>Reject Request</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Patient Match Making Button (shows only when request is approved) */}
+              {request.status === 'APPROVED' && (
                 <button
                   type="button"
                   onClick={() => {
-                    onApprove(request);
+                    navigate(`/admin/dashboard/patient-matching/${request.id}`);
                     onClose();
                   }}
-                  className="flex-1 flex items-center justify-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white py-2.5 rounded-xl text-xs font-black shadow-md cursor-pointer transition-colors font-display"
+                  className="w-full flex items-center justify-center gap-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white py-2.5 rounded-xl text-xs font-black shadow-[0_4px_12px_rgba(124,58,237,0.15)] hover:shadow-[0_6px_16px_rgba(124,58,237,0.25)] transition-all duration-200 cursor-pointer font-display"
                 >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Approve Request</span>
+                  <span>Match Making</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
                 </button>
-
-                {/* Reject Button */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    onReject(request);
-                    onClose();
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 bg-rose-500 hover:bg-rose-600 text-white py-2.5 rounded-xl text-xs font-black shadow-md cursor-pointer transition-colors font-display"
-                >
-                  <X className="w-4 h-4 stroke-[2.5px]" />
-                  <span>Reject Request</span>
-                </button>
-              </div>
-
-              {/* View Full Details */}
-              <button
-                type="button"
-                className="w-full flex items-center justify-center gap-2 border border-slate-200 hover:border-slate-350 hover:bg-slate-50 py-2.5 rounded-xl text-xs font-bold text-slate-650 hover:text-slate-800 transition-colors cursor-pointer"
-              >
-                <span>View Full Details</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
+              )}
             </div>
 
           </motion.div>

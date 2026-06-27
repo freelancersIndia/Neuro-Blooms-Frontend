@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, Clock, ArrowRight } from 'lucide-react';
 import AppointmentRequestRow from './AppointmentRequestRow';
 import AppointmentStatusBadge from './AppointmentStatusBadge';
@@ -14,7 +13,7 @@ export const AppointmentRequestsTable = ({ requests, onViewRequest, onApproveReq
         <table className="w-full text-left border-collapse min-w-[900px]">
           <thead>
             <tr className="bg-slate-50/50 border-b border-slate-100 text-[10px] font-black text-slate-400 uppercase tracking-widest font-display select-none">
-              <th className="px-5 py-4">Request ID</th>
+              <th className="px-5 py-4">Request Number</th>
               <th className="px-5 py-4">Parent</th>
               <th className="px-5 py-4">Child</th>
               <th className="px-5 py-4">Primary Concern</th>
@@ -25,7 +24,7 @@ export const AppointmentRequestsTable = ({ requests, onViewRequest, onApproveReq
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-50/80">
-            {requests.map((request, idx) => (
+            {requests.map((request) => (
               <AppointmentRequestRow
                 key={request.id}
                 request={request}
@@ -52,7 +51,7 @@ export const AppointmentRequestsTable = ({ requests, onViewRequest, onApproveReq
               {/* Card Header: ID & Status */}
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black text-slate-800 tracking-tight font-display">
-                  {request.id}
+                  {request.requestNumber || request.id}
                 </span>
                 <AppointmentStatusBadge status={request.status} />
               </div>
@@ -61,11 +60,6 @@ export const AppointmentRequestsTable = ({ requests, onViewRequest, onApproveReq
               <div className="grid grid-cols-2 gap-3 text-left">
                 {/* Parent */}
                 <div className="flex items-center gap-2.5">
-                  <img
-                    src={request.parentAvatar}
-                    alt={request.parentName}
-                    className="w-8.5 h-8.5 rounded-lg object-cover border border-slate-100 shadow-sm"
-                  />
                   <div className="flex flex-col min-w-0">
                     <span className="text-xs font-black text-slate-800 leading-snug truncate">
                       {request.parentName}

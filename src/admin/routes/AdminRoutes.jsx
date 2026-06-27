@@ -23,11 +23,13 @@ const DashboardPage = lazy(() => import('../pages/dashboard/DashboardPage'));
 const UsersPage = lazy(() => import('../pages/users/UsersPage'));
 const UserDetailsPage = lazy(() => import('../pages/users/UserDetailsPage'));
 const AppointmentRequestsPage = lazy(() => import('../../pages/appointments/AppointmentRequestsPage'));
+const PatientMatchingPage = lazy(() => import('../../pages/patients/PatientMatchingPage'));
+const PatientsPage = lazy(() => import('../../pages/dashboard/PatientsPage'));
 
 // Admin root selector that redirects based on login state
 const AdminRootRedirect = () => {
   const token = localStorage.getItem('nb_admin_access_token') || sessionStorage.getItem('nb_admin_access_token');
-  return token ? <Navigate to="dashboard" replace /> : <Navigate to="login" replace />;
+  return token ? <Navigate to="/admin/dashboard" replace /> : <Navigate to="/admin/login" replace />;
 };
 
 export const AdminRoutes = () => {
@@ -64,8 +66,10 @@ export const AdminRoutes = () => {
           <Route path="users" element={<UsersPage />} />
           <Route path="users/:userId" element={<UserDetailsPage />} />
           <Route path="appointments/requests" element={<AppointmentRequestsPage />} />
+          <Route path="dashboard/patient-matching/:requestId" element={<PatientMatchingPage />} />
+          <Route path="patients" element={<PatientsPage />} />
           {/* Redirect all other console sub-paths back to dashboard */}
-          <Route path="*" element={<Navigate to="dashboard" replace />} />
+          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Route>
 
         {/* Catch-all fallback inside /admin/* */}

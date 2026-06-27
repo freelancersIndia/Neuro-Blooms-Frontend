@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import AppointmentStatusBadge from './AppointmentStatusBadge';
 import RequestQuickActions from './RequestQuickActions';
@@ -14,19 +13,12 @@ export const AppointmentRequestRow = ({ request, onView, onApprove, onReject }) 
     >
       {/* Request ID */}
       <td className="px-5 py-4.5 text-xs font-black text-slate-800 tracking-tight font-display">
-        {request.id}
+        {request.requestNumber || request.id}
       </td>
 
       {/* Parent Info */}
       <td className="px-5 py-4.5">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-purple-50 overflow-hidden border border-slate-100 flex-shrink-0 shadow-sm">
-            <img
-              src={request.parentAvatar}
-              alt={request.parentName}
-              className="w-full h-full object-cover"
-            />
-          </div>
           <div className="flex flex-col text-left min-w-0">
             <span className="text-xs font-black text-slate-800 leading-snug truncate">
               {request.parentName}
