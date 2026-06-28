@@ -97,6 +97,12 @@ export const SIDEBAR_CONFIG = [
         icon: Clock3,
         route: '/admin/slots',
         roles: ['ADMIN', 'RECEPTIONIST']
+      },
+      {
+        label: 'Weekly Schedule',
+        icon: Clock3,
+        route: '/admin/weekly-schedule',
+        roles: ['ADMIN', 'RECEPTIONIST']
       }
     ]
   },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { Menu } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
-import TopbarPlaceholder from '../components/TopbarPlaceholder';
 
 export const DashboardLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -36,12 +36,21 @@ export const DashboardLayout = () => {
         onMobileClose={() => setIsMobileMenuOpen(false)}
       />
 
+      {/* Floating Mobile Menu Button */}
+      {!isMobileMenuOpen && (
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="fixed top-4 left-4 z-40 p-3 bg-white border border-slate-200 text-slate-600 rounded-xl shadow-sm hover:bg-slate-50 md:hidden cursor-pointer"
+          aria-label="Open menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+      )}
+
       {/* Main Viewport Container */}
       <div className={`flex-1 flex flex-col h-screen overflow-hidden min-w-0 transition-all duration-300 ease-in-out ${
         isCollapsed ? 'md:pl-[84px]' : 'md:pl-[300px]'
       }`}>
-        <TopbarPlaceholder onMobileMenuOpen={() => setIsMobileMenuOpen(true)} />
-
         <main className="flex-1 p-6 overflow-y-auto flex flex-col gap-4 bg-[#F8FAFC]">
           <Outlet />
         </main>

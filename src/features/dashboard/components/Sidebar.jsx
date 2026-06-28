@@ -122,14 +122,14 @@ export const Sidebar = ({
 
   // Sidebar brand/logo renderer
   const renderBrand = () => (
-    <div className={`relative flex items-center pt-8 px-6 pb-6 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-      <div className="flex items-center gap-3 overflow-hidden">
+    <div className={`relative flex items-center pt-5 px-5 pb-3 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+      <div className="flex items-center gap-2.5 overflow-hidden">
         {/* SVG Brain-Tree Logo */}
         <motion.div
           whileHover={{ scale: 1.05, rotate: 3 }}
-          className="w-11 h-11 rounded-2xl bg-purple-50/50 border border-purple-100 flex items-center justify-center shadow-sm flex-shrink-0 cursor-pointer"
+          className="w-9.5 h-9.5 rounded-[12px] bg-purple-50/50 border border-purple-100 flex items-center justify-center shadow-sm flex-shrink-0 cursor-pointer"
         >
-          <svg viewBox="0 0 24 24" className="w-7.5 h-7.5" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 24 24" className="w-6.5 h-6.5" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 22V12" stroke="#7C3AED" strokeWidth="2.5" strokeLinecap="round" />
             <path d="M12 15C10 13.5 8.5 13 6.5 14" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" />
             <path d="M12 15C14 13.5 15.5 13 17.5 14" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" />
@@ -146,10 +146,10 @@ export const Sidebar = ({
 
         {!isCollapsed && (
           <div className="flex flex-col text-left font-display">
-            <h1 className="text-xl font-bold leading-none tracking-tight text-[#0F172A]">
-              NEURO<span className="text-[#10B981] ml-1">Blooms</span>
+            <h1 className="text-lg font-bold leading-none tracking-tight text-[#0F172A]">
+              NEURO<span className="text-[#10B981] ml-0.5">Blooms</span>
             </h1>
-            <span className="text-xs font-semibold tracking-wider text-[#64748B] mt-1.5 leading-none">
+            <span className="text-[10px] font-semibold tracking-wider text-[#64748B] mt-1 leading-none">
               HMS Console
             </span>
           </div>
@@ -160,7 +160,7 @@ export const Sidebar = ({
       <motion.button
         whileHover={{ scale: 1.08, rotate: isCollapsed ? 12 : -12 }}
         onClick={onToggleCollapse}
-        className="hidden md:flex absolute -right-5 top-9 z-50 h-10 w-10 items-center justify-center rounded-full border border-[#EEF2F7] bg-white text-slate-500 shadow-md transition-colors hover:text-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-[#7C3AED]"
+        className="hidden md:flex absolute -right-5 top-5 z-50 h-10 w-10 items-center justify-center rounded-full border border-[#EEF2F7] bg-white text-slate-500 shadow-md transition-colors hover:text-[#7C3AED] focus:outline-none focus:ring-2 focus:ring-[#7C3AED]"
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
@@ -170,7 +170,7 @@ export const Sidebar = ({
 
   // Sidebar content (navigation items)
   const renderNavItems = () => (
-    <div className="flex-1 overflow-y-auto px-4 py-6 space-y-7 scrollbar-thin select-none">
+    <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4 scrollbar-thin select-none">
       {/* Dashboard Top Link */}
       <div>
         <NavLink
@@ -179,7 +179,7 @@ export const Sidebar = ({
             if (isMobileOpen) onMobileClose();
           }}
           className={({ isActive }) =>
-            `flex items-center h-14 rounded-2xl px-4 gap-4 w-full transition-all duration-200 text-sm font-semibold font-display select-none cursor-pointer outline-none relative ${
+            `flex items-center h-10 rounded-xl px-3 gap-3.5 w-full transition-all duration-200 text-xs font-semibold font-display select-none cursor-pointer outline-none relative ${
               isActive
                 ? 'bg-[#F3EEFF] text-[#7C3AED]'
                 : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
@@ -195,7 +195,7 @@ export const Sidebar = ({
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 />
               )}
-              <LayoutDashboard size={22} className={isActive ? 'text-[#7C3AED]' : 'text-[#64748B]'} />
+              <LayoutDashboard size={18} className="text-[#7C3AED]" />
               {!isCollapsed && <span>Dashboard</span>}
               {isCollapsed && (
                 <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-3 py-1.5 bg-slate-900 text-white text-xs font-medium rounded-md opacity-0 pointer-events-none transition-opacity duration-200 group-hover:opacity-100 whitespace-nowrap z-50 shadow-md">
@@ -209,13 +209,13 @@ export const Sidebar = ({
 
       {/* Dividers & Configuration Sections */}
       {menuConfig.map((section, idx) => (
-        <div key={section.section} className="space-y-3">
+        <div key={section.section} className="space-y-1">
           {/* Section Divider */}
-          {idx > 0 && <div className="border-t border-[#F1F5F9] my-4 mx-1" />}
+          {idx > 0 && <div className="border-t border-[#F1F5F9] my-2 mx-0.5" />}
 
           {/* Section Header Label */}
           {!isCollapsed ? (
-            <h3 className="px-4 text-[11px] font-bold uppercase tracking-wider text-[#94A3B8] font-display">
+            <h3 className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] font-display">
               {section.section}
             </h3>
           ) : (
@@ -223,7 +223,7 @@ export const Sidebar = ({
           )}
 
           {/* Section Menu Items */}
-          <div className="space-y-1.5">
+          <div className="space-y-0.5">
             {section.items.map((item) => {
               const isGroupExpanded = !!expandedGroups[item.id];
               const isAnyChildActive = item.children.some(child => child.path === location.pathname);
@@ -247,20 +247,20 @@ export const Sidebar = ({
                   <button
                     onClick={() => !isCollapsed && handleToggleGroup(item.id)}
                     aria-expanded={isGroupExpanded}
-                    className={`w-full flex items-center justify-between h-13 rounded-xl px-4 text-left transition-all duration-200 text-sm font-semibold font-display focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 ${
+                    className={`w-full flex items-center justify-between h-10 rounded-xl px-3 text-left transition-all duration-200 text-xs font-semibold font-display focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 ${
                       isAnyChildActive
                         ? 'text-[#0F172A]'
                         : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3.5">
                       {/* Dynamic Colorized Icon with Micro-Hover Animation */}
                       <div className="transition-transform duration-200 group-hover/item:scale-110">
                         <DynamicIcon
                           name={item.icon}
-                          size={21}
+                          size={18}
                           style={{
-                            color: (isAnyChildActive || isHovered) ? item.color : '#94A3B8',
+                            color: item.color,
                             transition: 'color 0.2s ease'
                           }}
                         />
@@ -292,7 +292,7 @@ export const Sidebar = ({
                           variants={containerVariants}
                           className="overflow-hidden"
                         >
-                          <div className="mt-1 pl-12 space-y-1">
+                          <div className="mt-0.5 pl-10 space-y-0.5">
                             {item.children.map((child) => {
                               const isChildActive = child.path === location.pathname;
                               return (
@@ -302,7 +302,7 @@ export const Sidebar = ({
                                     onClick={() => {
                                       if (isMobileOpen) onMobileClose();
                                     }}
-                                    className={`flex items-center h-10 px-4 rounded-xl text-xs font-semibold font-display transition-colors duration-150`}
+                                    className={`flex items-center h-8 px-3 rounded-xl text-xs font-semibold font-display transition-colors duration-150`}
                                     style={
                                       isChildActive
                                         ? { backgroundColor: themeColors.bg, color: themeColors.text }
@@ -311,10 +311,10 @@ export const Sidebar = ({
                                   >
                                     {/* Indented Indicator Bullet */}
                                     <span
-                                      className="w-1.5 h-1.5 rounded-full mr-3.5 flex-shrink-0 transition-all duration-200"
+                                      className="w-1.5 h-1.5 rounded-full mr-2.5 flex-shrink-0 transition-all duration-200"
                                       style={{
-                                        backgroundColor: isChildActive ? themeColors.dot : '#E2E8F0',
-                                        scale: isChildActive ? 1.2 : 1
+                                        backgroundColor: isChildActive ? themeColors.dot : `${item.color}40`,
+                                        scale: isChildActive ? 1.1 : 1
                                       }}
                                     />
                                     <span>{child.title}</span>
@@ -376,53 +376,46 @@ export const Sidebar = ({
     </div>
   );
 
-  // Pinned User Profile Card & Logout Button
+  // Pinned User Profile Card & Logout Button in One Row
   const renderFooter = () => (
-    <div className="p-4 space-y-3 border-t border-[#EEF2F7]">
-      {/* User Card */}
-      <div className={`bg-[#F8FAFC] border border-[#EEF2F7] rounded-[20px] p-3 flex items-center transition-all duration-300 ${
-        isCollapsed ? 'justify-center p-2' : 'justify-between'
-      }`}>
-        <div className="flex items-center gap-3 overflow-hidden">
-          {/* Avatar image */}
-          <img
-            src={avatarUrl}
-            alt={displayName}
-            className="w-10 h-10 rounded-full object-cover flex-shrink-0 shadow-sm border border-white"
-          />
-
-          {!isCollapsed && (
-            <div className="flex flex-col text-left overflow-hidden font-display">
-              <span className="text-xs font-bold text-[#0F172A] truncate">
-                {displayName}
-              </span>
-              <div className="flex items-center mt-1">
-                <span className="text-[9px] font-bold text-[#7C3AED] bg-[#F3EEFF] px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  {displayRole}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
+    <div className={`p-4 border-t border-[#EEF2F7] flex items-center gap-3 font-display ${
+      isCollapsed ? 'flex-col justify-center' : 'justify-between'
+    }`}>
+      {/* User Info Block */}
+      <div className="flex items-center gap-3 overflow-hidden min-w-0">
+        {/* Avatar image */}
+        <img
+          src={avatarUrl}
+          alt={displayName}
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0 shadow-sm border border-white"
+        />
 
         {!isCollapsed && (
-          <button className="p-1 rounded-lg text-slate-400 hover:bg-slate-200/50 hover:text-slate-600 focus:outline-none transition-colors">
-            <MoreVertical size={16} />
-          </button>
+          <div className="flex flex-col text-left overflow-hidden">
+            <span className="text-xs font-bold text-[#0F172A] truncate">
+              {displayName}
+            </span>
+            <div className="flex items-center mt-1">
+              <span className="text-[9px] font-bold text-[#7C3AED] bg-[#F3EEFF] px-2 py-0.5 rounded-full uppercase tracking-wider">
+                {displayRole}
+              </span>
+            </div>
+          </div>
         )}
       </div>
 
       {/* Logout Action Button */}
       <button
         onClick={handleLogout}
-        className={`w-full flex items-center h-13 rounded-xl px-4 gap-4 text-sm font-semibold font-display transition-all duration-200 focus:outline-none ${
+        className={`flex-shrink-0 flex items-center justify-center rounded-xl transition-all duration-200 focus:outline-none ${
           isCollapsed
-            ? 'justify-center text-slate-400 hover:bg-red-50 hover:text-[#DC2626]'
-            : 'text-slate-500 hover:bg-[#FEF2F2] hover:text-[#DC2626]'
+            ? 'w-10 h-10 text-slate-400 hover:bg-red-50 hover:text-[#DC2626]'
+            : 'w-10 h-10 bg-slate-50 border border-slate-100 text-slate-400 hover:bg-[#FEF2F2] hover:border-red-100 hover:text-[#DC2626] focus:ring-2 focus:ring-red-500/20'
         }`}
+        title="Logout"
+        aria-label="Logout"
       >
-        <LogOut size={20} />
-        {!isCollapsed && <span>Logout</span>}
+        <LogOut size={18} />
       </button>
     </div>
   );

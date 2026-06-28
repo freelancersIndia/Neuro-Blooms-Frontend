@@ -5,26 +5,6 @@ import { useAuth } from '../../auth/hooks/useAuth';
 export const TopbarPlaceholder = ({ onMobileMenuOpen }) => {
   const { user } = useAuth();
 
-  const getGreeting = () => {
-    try {
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'Asia/Kolkata',
-        hour: 'numeric',
-        hour12: false
-      });
-      const hour = parseInt(formatter.format(new Date()), 10);
-      
-      if (hour >= 5 && hour < 12) return 'Good Morning';
-      if (hour >= 12 && hour < 17) return 'Good Afternoon';
-      return 'Good Evening';
-    } catch (e) {
-      const hour = new Date().getHours();
-      if (hour >= 5 && hour < 12) return 'Good Morning';
-      if (hour >= 12 && hour < 17) return 'Good Afternoon';
-      return 'Good Evening';
-    }
-  };
-
   const displayName = user
     ? user.first_name || user.name?.split(' ')[0] || 'Admin'
     : 'Admin';
@@ -42,16 +22,6 @@ export const TopbarPlaceholder = ({ onMobileMenuOpen }) => {
         >
           <Menu className="w-5 h-5" />
         </button>
-        
-        {/* Left Side: Greeting */}
-        <div className="flex flex-col text-left">
-          <h1 className="text-lg md:text-xl font-black text-[#0F172A] tracking-tight font-display leading-tight">
-            {getGreeting()}, {displayName} 👋
-          </h1>
-          <p className="text-[10px] md:text-xs font-semibold text-slate-400 mt-0.5 leading-none hidden sm:block">
-            Welcome back to Neuro Blooms Administration Portal
-          </p>
-        </div>
       </div>
 
       {/* Right Side: Search + Controls */}
