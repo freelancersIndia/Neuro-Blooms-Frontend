@@ -55,7 +55,7 @@ export const menuConfig = [
         children: [
           { title: 'Doctor Availability', path: '/admin/doctors/availability' },
           { title: 'Doctor Working Days', path: '/admin/doctors/working-days' },
-          { title: 'Doctor Leave', path: '/admin/doctors/leave' },
+          { title: 'Doctor Leaves', path: '/admin/doctors/leaves' },
           { title: 'Doctor Blocked Time', path: '/admin/doctors/blocked-time' }
         ]
       },

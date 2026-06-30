@@ -16,6 +16,35 @@
   --color-accent-dark: #D97706;
   --color-accent-soft: #FEF3C7;
 
+  --color-booking-primary: #1E3A8A;
+  --color-booking-primary-light: #2563EB;
+  --color-booking-primary-dark: #1E40AF;
+  --color-booking-primary-soft: #EFF6FF;
+
+  --color-booking-secondary: #0EA5E9;
+  --color-booking-secondary-light: #38BDF8;
+  --color-booking-secondary-dark: #0369A1;
+  --color-booking-secondary-soft: #F0F9FF;
+
+  --color-booking-accent: #0D9488;
+  --color-booking-accent-light: #14B8A6;
+  --color-booking-accent-dark: #0F766E;
+  --color-booking-accent-soft: #F0FDFA;
+
+  --color-booking-success: #10B981;
+  --color-booking-success-light: #34D399;
+  --color-booking-success-soft: #ECFDF5;
+
+  --color-booking-warning: #F59E0B;
+  --color-booking-warning-light: #FBBF24;
+  --color-booking-warning-soft: #FEF3C7;
+
+  --color-booking-error: #EF4444;
+  --color-booking-error-light: #F87171;
+  --color-booking-error-soft: #FEF2F2;
+
+  --color-booking-bg: #F8FAFC;
+
   --color-admin-blue-50: #eff6ff;
   --color-admin-blue-100: #dbeafe;
   --color-admin-blue-500: #3b82f6;

@@ -1,238 +1,198 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useCreateAppointment } from '../../hooks/useAppointments';
-import { useDoctors } from '../../hooks/useDoctors';
-import { useServices } from '../../hooks/useServices';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight, Check, Sparkles, Calendar, Clock, AlertCircle } from 'lucide-react';
 import Container from '../../../../components/common/Container';
 import SectionTitle from '../../../../components/common/SectionTitle';
-import InputField from '../../../../components/forms/InputField';
-import SelectField from '../../../../components/forms/SelectField';
-import TextAreaField from '../../../../components/forms/TextAreaField';
-import FormWrapper from '../../../../components/forms/FormWrapper';
-import Button from '../../../../components/common/Button';
-import LoadingSpinner from '../../../../components/common/LoadingSpinner';
-import ErrorMessage from '../../../../components/common/ErrorMessage';
-import { CheckCircle, Calendar, Heart } from 'lucide-react';
+
+// Custom Booking Flow Components
+import ProgressStepper from '../../../../components/booking/ProgressStepper';
+import DoctorSelector from '../../../../components/booking/DoctorSelector';
+import CalendarPicker from '../../../../components/booking/CalendarPicker';
+import SlotGrid from '../../../../components/booking/SlotGrid';
+import PatientForm from '../../../../components/booking/PatientForm';
+import AppointmentSummary from '../../../../components/booking/AppointmentSummary';
+import SuccessScreen from '../../../../components/booking/SuccessScreen';
+
+// State & Hooks
+import { useBookingStore } from '../../../../store/bookingStore';
 
 export const AppointmentPage = () => {
+  const { step, doctor, date, slot, setStep } = useBookingStore();
+  
+  // Local state to manage the final submission success view
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submissionData, setSubmissionData] = useState(null);
 
-  const { data: doctors, isLoading: loadingDoctors } = useDoctors();
-  const { data: services, isLoading: loadingServices } = useServices();
-  const { mutateAsync: createAppointment, isPending } = useCreateAppointment();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm({
-    defaultValues: {
-      parentName: '',
-      email: '',
-      phone: '',
-      childName: '',
-      childAge: '',
-      serviceId: '',
-      doctorId: '',
-      appointmentDate: '',
-      notes: '',
-    },
-  });
-
-  const onSubmit = async (data) => {
-    try {
-      const response = await createAppointment(data);
-      if (response?.success) {
-        setIsSubmitted(true);
-        setSubmissionData(response.data);
-        reset();
-      }
-    } catch (err) {
-      console.error('Submission failed', err);
-    }
+  const handleSubmissionSuccess = (data) => {
+    setSubmissionData(data);
+    setIsSubmitted(true);
   };
 
-  if (loadingDoctors || loadingServices) {
-    return <LoadingSpinner size="lg" className="min-h-[60vh]" />;
-  }
+  const handleReset = () => {
+    setIsSubmitted(false);
+    setSubmissionData(null);
+  };
 
-  // Map doctors and services to option arrays
-  const doctorOptions = doctors?.map((doc) => ({
-    value: doc.id,
-    label: `${doc.name} (${doc.role})`,
-  })) || [];
+  // Step 1 Validation Checkmarks
+  const isDoctorSelected = !!doctor;
+  const isDateSelected = !!date;
+  const isSlotSelected = !!slot;
+  const isStep1Valid = isDoctorSelected && isDateSelected && isSlotSelected;
 
-  const serviceOptions = services?.map((serv) => ({
-    value: serv.id,
-    label: serv.title,
-  })) || [];
+  // Slide transitions for step changes
+  const stepVariants = {
+    initial: { opacity: 0, x: 30 },
+    animate: { opacity: 1, x: 0, transition: { duration: 0.35, ease: 'easeOut' } },
+    exit: { opacity: 0, x: -30, transition: { duration: 0.25, ease: 'easeIn' } },
+  };
 
   return (
-    <div className="py-16">
-      <Container className="max-w-3xl">
-        <SectionTitle
-          subtitle="Clinical Scheduler"
-          title="Book an Intake Assessment"
-        />
+    <div className="py-12 bg-booking-bg min-h-screen font-body overflow-x-hidden relative">
+      {/* Premium Floating Decorative Background Elements */}
+      <div className="absolute top-10 left-10 w-72 h-72 bg-booking-secondary/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-booking-primary/5 rounded-full blur-3xl pointer-events-none" />
 
-        {isSubmitted ? (
-          <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl text-center space-y-6 animate-fade-in-up">
-            <div className="bg-teal-50 text-primary p-4 rounded-full w-20 h-20 flex items-center justify-center mx-auto shadow-inner">
-              <CheckCircle className="h-10 w-10" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-bold text-gray-900 font-display">Appointment Scheduled</h3>
-              <p className="text-gray-600 max-w-md mx-auto text-sm leading-relaxed">
-                Thank you, <span className="font-bold text-gray-900">{submissionData?.parentName}</span>. 
-                Our child support coordinators will contact you at <span className="font-bold text-gray-900">{submissionData?.phone}</span> within 24 hours to confirm your intake date.
-              </p>
-            </div>
+      <Container className="max-w-6xl relative z-10">
+        <div className="text-center space-y-2 mb-8">
+          <SectionTitle
+            subtitle="Intake Portal"
+            title="Book an Intake Appointment"
+          />
+          <p className="text-xs text-slate-500 max-w-md mx-auto">
+            Our expert multidisciplinary team is here to support your child's developmental journey.
+          </p>
+        </div>
 
-            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-left space-y-3 max-w-md mx-auto">
-              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Intake Receipt</h4>
-              <div className="text-xs space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Child Reference:</span>
-                  <span className="font-semibold text-gray-900">{submissionData?.childName} (Age: {submissionData?.childAge})</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Intake Reference ID:</span>
-                  <span className="font-mono text-gray-900">NB-{submissionData?.id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Target Date:</span>
-                  <span className="font-semibold text-gray-900">{submissionData?.appointmentDate}</span>
-                </div>
+        {/* 1. Progress Stepper */}
+        {!isSubmitted && <ProgressStepper currentStep={step} />}
+
+        {/* 2. Step Wizard Container */}
+        <div className="mt-8">
+          <AnimatePresence mode="wait">
+            {isSubmitted ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.4 }}
+              >
+                <SuccessScreen submissionData={submissionData} onReset={handleReset} />
+              </motion.div>
+            ) : (
+              <div className="w-full">
+                {/* STEP 1: Doctor, Date & Time Selection */}
+                {step === 1 && (
+                  <motion.div
+                    key="step1"
+                    variants={stepVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto"
+                  >
+                    {/* Left Panel: Doctor Dropdown & Card */}
+                    <div className="lg:col-span-5 bg-white border border-slate-100/80 rounded-[32px] p-6 shadow-xl shadow-slate-100/40">
+                      <DoctorSelector />
+                    </div>
+
+                    {/* Right Panel: Calendar and Time Slot Chips */}
+                    <div className="lg:col-span-7 space-y-6 bg-white border border-slate-100/80 rounded-[32px] p-6 shadow-xl shadow-slate-100/40">
+                      <CalendarPicker />
+                      <SlotGrid />
+
+                      {/* Step 1 Validation Checkmarks & Continue Control */}
+                      <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        
+                        {/* Interactive Checklist Indicators */}
+                        <div className="flex flex-wrap gap-3 text-[10px] font-bold text-slate-400 select-none">
+                          <div className="flex items-center gap-1.5">
+                            <motion.span
+                              animate={{ scale: isDoctorSelected ? [1, 1.2, 1] : 1 }}
+                              className={`w-4 h-4 rounded-full flex items-center justify-center border ${
+                                isDoctorSelected
+                                  ? 'bg-booking-success/10 border-booking-success text-booking-success'
+                                  : 'border-slate-200 text-slate-300'
+                              }`}
+                            >
+                              {isDoctorSelected ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : '1'}
+                            </motion.span>
+                            <span className={isDoctorSelected ? 'text-booking-success' : ''}>Doctor Selected</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <motion.span
+                              animate={{ scale: isDateSelected ? [1, 1.2, 1] : 1 }}
+                              className={`w-4 h-4 rounded-full flex items-center justify-center border ${
+                                isDateSelected
+                                  ? 'bg-booking-success/10 border-booking-success text-booking-success'
+                                  : 'border-slate-200 text-slate-300'
+                              }`}
+                            >
+                              {isDateSelected ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : '2'}
+                            </motion.span>
+                            <span className={isDateSelected ? 'text-booking-success' : ''}>Date Chosen</span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <motion.span
+                              animate={{ scale: isSlotSelected ? [1, 1.2, 1] : 1 }}
+                              className={`w-4 h-4 rounded-full flex items-center justify-center border ${
+                                isSlotSelected
+                                  ? 'bg-booking-success/10 border-booking-success text-booking-success'
+                                  : 'border-slate-200 text-slate-300'
+                              }`}
+                            >
+                              {isSlotSelected ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : '3'}
+                            </motion.span>
+                            <span className={isSlotSelected ? 'text-booking-success' : ''}>Time Slot Selected</span>
+                          </div>
+                        </div>
+
+                        {/* Continue Button */}
+                        <button
+                          type="button"
+                          disabled={!isStep1Valid}
+                          onClick={() => setStep(2)}
+                          className="w-full sm:w-auto h-11 px-6 rounded-xl bg-booking-primary hover:bg-booking-primary-light text-white text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-booking-primary/15"
+                        >
+                          Next: Patient Details
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* STEP 2: Patient and Family Details */}
+                {step === 2 && (
+                  <motion.div
+                    key="step2"
+                    variants={stepVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                  >
+                    <PatientForm />
+                  </motion.div>
+                )}
+
+                {/* STEP 3: Summary and Submission */}
+                {step === 3 && (
+                  <motion.div
+                    key="step3"
+                    variants={stepVariants}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                  >
+                    <AppointmentSummary onSubmissionSuccess={handleSubmissionSuccess} />
+                  </motion.div>
+                )}
               </div>
-            </div>
-
-            <div className="pt-4">
-              <Button onClick={() => setIsSubmitted(false)} variant="outline">
-                Schedule Another Intake
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <FormWrapper
-            onSubmit={handleSubmit(onSubmit)}
-            title="Development Intake Questionnaire"
-            description="Provide details regarding developmental support objectives. All medical answers are secure under clinical privacy policies."
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Parent Details */}
-              <InputField
-                label="Parent / Guardian Name"
-                name="parentName"
-                placeholder="Full Name"
-                required
-                error={errors.parentName}
-                {...register('parentName', { required: 'Parent/Guardian name is required' })}
-              />
-
-              <InputField
-                label="Phone Number"
-                name="phone"
-                type="tel"
-                placeholder="e.g. (555) 000-0000"
-                required
-                error={errors.phone}
-                {...register('phone', {
-                  required: 'Phone number is required',
-                  pattern: {
-                    value: /^[+]?[0-9\s\-()]{7,18}$/,
-                    message: 'Please provide a valid contact phone number',
-                  },
-                })}
-              />
-
-              <InputField
-                label="Email Address"
-                name="email"
-                type="email"
-                placeholder="parent@example.com"
-                required
-                error={errors.email}
-                {...register('email', {
-                  required: 'Email address is required',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Invalid email address format',
-                  },
-                })}
-              />
-
-              {/* Child Details */}
-              <div className="grid grid-cols-3 gap-3">
-                <InputField
-                  label="Child's First Name"
-                  name="childName"
-                  placeholder="Name"
-                  required
-                  className="col-span-2"
-                  error={errors.childName}
-                  {...register('childName', { required: 'Required' })}
-                />
-                <InputField
-                  label="Age"
-                  name="childAge"
-                  type="number"
-                  placeholder="Age"
-                  required
-                  error={errors.childAge}
-                  {...register('childAge', {
-                    required: 'Required',
-                    min: { value: 1, message: 'Must be > 0' },
-                    max: { value: 18, message: 'Max 18' },
-                  })}
-                />
-              </div>
-
-              {/* Services & Doctors Selects */}
-              <SelectField
-                label="Primary Care Inquiry"
-                name="serviceId"
-                options={serviceOptions}
-                required
-                error={errors.serviceId}
-                {...register('serviceId', { required: 'Please select a service' })}
-              />
-
-              <SelectField
-                label="Preferred Clinician"
-                name="doctorId"
-                options={doctorOptions}
-                placeholder="Select Doctor (Or First Available)"
-                error={errors.doctorId}
-                {...register('doctorId')}
-              />
-
-              <InputField
-                label="Preferred Date"
-                name="appointmentDate"
-                type="date"
-                required
-                error={errors.appointmentDate}
-                {...register('appointmentDate', { required: 'Preferred intake date is required' })}
-              />
-            </div>
-
-            <TextAreaField
-              label="Developmental History / Notes"
-              name="notes"
-              placeholder="Tell us about your child's communication preferences, sensory concerns, or goals."
-              error={errors.notes}
-              {...register('notes')}
-            />
-
-            <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-4">
-              <Button type="submit" isLoading={isPending} className="shadow-lg shadow-teal-700/25">
-                Submit Intake Request
-              </Button>
-            </div>
-          </FormWrapper>
-        )}
+            )}
+          </AnimatePresence>
+        </div>
       </Container>
     </div>
   );

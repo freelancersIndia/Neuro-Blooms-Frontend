@@ -1,16 +1,16 @@
 import React from 'react';
 import { Award, Calendar, Clock } from 'lucide-react';
 
-export const DoctorInfoCard = () => {
-  const doctorPhoto = "/images/doctor/dr_a_jagadish.png";
+export const DoctorInfoCard = ({ doctor }) => {
+  if (!doctor) return null;
 
   return (
     <div className="bg-[#FAF9F6] border border-slate-100/80 rounded-2xl p-4 flex items-center gap-4 w-full text-left shadow-sm">
       {/* Doctor Photo */}
       <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-sm flex-shrink-0 bg-slate-100">
         <img 
-          src={doctorPhoto} 
-          alt="Dr. A. Jagadish" 
+          src={doctor.profile_image || "/images/doctor/dr_a_jagadish.png"} 
+          alt={doctor.full_name} 
           className="w-full h-full object-cover" 
         />
       </div>
@@ -21,25 +21,21 @@ export const DoctorInfoCard = () => {
           Your Appointment With
         </span>
         <h4 className="text-sm sm:text-base font-extrabold text-[#3B8A4C] font-display leading-tight">
-          Dr. A. Jagadish
+          {doctor.full_name}
         </h4>
         <p className="text-[10px] sm:text-xs text-slate-500 font-semibold leading-tight">
-          Pediatrician &amp; Child Development Specialist
+          {doctor.specialization}
         </p>
 
         {/* Small metadata list */}
         <div className="grid grid-cols-1 gap-1 pt-1.5 text-[9px] sm:text-[10px] text-slate-600 font-semibold">
           <div className="flex items-center gap-1.5">
             <Award className="h-3 w-3 text-[#3B8A4C]" />
-            <span>23+ Years Experience</span>
+            <span>{doctor.experience || 10}+ Years Experience</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Calendar className="h-3 w-3 text-[#3B8A4C]" />
-            <span>MON - SAT</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Clock className="h-3 w-3 text-[#3B8A4C]" />
-            <span>09:00 AM - 06:00 PM</span>
+            <Award className="h-3 w-3 text-[#3B8A4C]" />
+            <span>{doctor.qualification || 'MD'}</span>
           </div>
         </div>
       </div>
